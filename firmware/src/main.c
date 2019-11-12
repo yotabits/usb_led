@@ -34,7 +34,7 @@ void set_led_to(uchar value)
 
 void flip_led()
 {
-    PORTB ^= (LED << 1);
+    PORTB ^= (1  << LED);
 }
 
 // bRequest = 1 ---> flip led
