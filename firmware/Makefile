@@ -1,6 +1,6 @@
 CXX         := avr-gcc
 CXXFLAGS    :=  -Wall -Os -DF_CPU=16500000 -DDEBUG_LEVEL=0 -mmcu=attiny85
-INCLUDE     := -Ivusb -Ilib-device
+INCLUDE     := -Ivusb
 BUILD       := ./build
 OBJ_DIR     := $(BUILD)/obj
 OUTPUT_DIR  := ./
