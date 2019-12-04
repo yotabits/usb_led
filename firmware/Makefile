@@ -1,6 +1,6 @@
 CXX         := avr-gcc
 CXXFLAGS    :=  -Wall -Os -DF_CPU=16500000 -DDEBUG_LEVEL=0 -mmcu=attiny85
-INCLUDE     := -Ivusb
+INCLUDE     := -Ivusb -Iincludes
 BUILD       := ./build
 OBJ_DIR     := $(BUILD)/obj
 OUTPUT_DIR  := ./
@@ -12,6 +12,8 @@ SRC         := src/main.c vusb/libs-device/osccal.c vusb/usbdrvasm.S vusb/usbdrv
 
 hex: build $(TARGET_HEX)
 
+build:
+	mkdir $(BUILD)
 
 $(TARGET_BIN):
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(SRC) -o $@
