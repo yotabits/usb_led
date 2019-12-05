@@ -29,6 +29,12 @@ void set_led_to(libusb_device_handle* dev_handle, unsigned char value)
     send_data(2, &value, dev_handle, 1);
 }
 
+void set_rgb_led_to(libusb_device_handle* dev_handle, unsigned char *value)
+{
+    send_data(2, value, dev_handle, 3);
+}
+
+
 int main()
 {
     libusb_device **devs;
@@ -65,8 +71,10 @@ int main()
     if (r != 0)
         std::cout << "Failed to claim interface with error: " << r << std::endl;
 
-    //flip_led(dev_handle);
+    flip_led(dev_handle);
     set_led_to(dev_handle, 1);
+    uint8_t rgb[] = {1, 1, 1};
+    set_rgb_led_to(dev_handle, rgb);
 
     libusb_release_interface(dev_handle, 0);
     libusb_close(dev_handle);
