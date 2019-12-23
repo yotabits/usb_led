@@ -1,5 +1,6 @@
 CXX         := -c++
-CXXFLAGS    :=  -Wall
+CXXFLAGS    := -Wall
+INCLUDE     := -Iincludes
 LDLIBS      := -lusb-1.0
 BUILD       := ./build
 OBJ_DIR     := $(BUILD)/obj
@@ -13,7 +14,7 @@ all: build $(OUTPUT_DIR)/$(TARGET)
 
 $(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(@D)
-	$(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -o $@ -c $<
 
 $(OUTPUT_DIR)/$(TARGET): $(OBJECTS)
 	@mkdir -p $(@D)

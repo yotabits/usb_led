@@ -1,9 +1,11 @@
 #include <iostream>
 #include <libusb-1.0/libusb.h>
 #include <usb.h>
+#include <cmath>
+#include <stdio.h>
+#include "cpu_color.h"
 #define VID 0x16c0
 #define PID 0x05df
-using namespace std;
 
 
 void send_data(uint8_t request, unsigned char *to_send,
@@ -13,7 +15,7 @@ void send_data(uint8_t request, unsigned char *to_send,
     uint8_t bRequest = request;
     uint16_t wValue = 0xDEAD; // Arbitrary vendor requests
     uint16_t wIndex = 0xBEEF; // Arbitrary vendor requests
-    unsigned int timeout = 300;
+    unsigned int timeout = 0;
     int sent = libusb_control_transfer(dev_handle, bmRequestType, bRequest,
                             wValue, wIndex, to_send, data_length, timeout);
     std::cout << sent << " bytes sent" << std::endl;
@@ -34,6 +36,16 @@ void set_rgb_led_to(libusb_device_handle* dev_handle, unsigned char *value)
     send_data(2, value, dev_handle, 3);
 }
 
+void show_color_range(libusb_device_handle* dev_handle)
+{
+    uint8_t to_show[3];
+    for (uint16_t color_h = 230; color_h > 0; color_h--)
+    {
+        HSVtoRGB(color_h, 1, 1, to_show);
+        set_rgb_led_to(dev_handle, to_show);
+        usleep(10000);
+    }
+}
 
 int main()
 {
@@ -73,11 +85,11 @@ int main()
 
     flip_led(dev_handle);
     set_led_to(dev_handle, 1);
-    uint8_t rgb[] = {1, 1, 1};
-    set_rgb_led_to(dev_handle, rgb);
-
-    libusb_release_interface(dev_handle, 0);
-    libusb_close(dev_handle);
-    libusb_exit(ctx); //close the session
-    return 0;
+    uint8_t rgb[3] = {};
+    show_color_range(dev_handle);
+    while (true)
+    {
+        get_cpu_color(rgb);
+        set_rgb_led_to(dev_handle, rgb);
+    }
 }
