@@ -36,6 +36,36 @@ void set_rgb_led_to(libusb_device_handle* dev_handle, unsigned char *value)
     send_data(2, value, dev_handle, 3);
 }
 
+void set_led_to_hue(libusb_device_handle* dev_handle, uint16_t hue)
+{
+    uint8_t to_show[3];
+    HSVtoRGB(hue, 1, 1, to_show);
+    set_rgb_led_to(dev_handle, to_show);
+}
+
+void show_variation(libusb_device_handle* dev_handle,
+                    uint16_t start_hue, uint16_t end_hue, uint32_t time_micro_s)
+{
+    int8_t moving = 1;
+    uint32_t sleep_time = 0;
+
+    if (start_hue > end_hue)
+        moving = -1;
+
+    if (start_hue != end_hue)
+        sleep_time = time_micro_s / (abs(start_hue - end_hue));
+
+    // If start == end we at least set the led
+    // to the correct value.
+    set_led_to_hue(dev_handle, start_hue);
+    while (start_hue != end_hue)
+    {
+        usleep(sleep_time);
+        start_hue += moving;
+        std::cout << "HUE " << start_hue << std::endl;
+        set_led_to_hue(dev_handle, start_hue);
+    }
+}
 void show_color_range(libusb_device_handle* dev_handle)
 {
     uint8_t to_show[3];
@@ -83,10 +113,9 @@ int main()
     if (r != 0)
         std::cout << "Failed to claim interface with error: " << r << std::endl;
 
-    flip_led(dev_handle);
     set_led_to(dev_handle, 1);
     uint8_t rgb[3] = {};
-    show_color_range(dev_handle);
+    show_variation(dev_handle, 230, 0, 3000000);
     while (true)
     {
         get_cpu_color(rgb);
