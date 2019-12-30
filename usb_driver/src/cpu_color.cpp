@@ -1,12 +1,10 @@
-
-
 #include <iostream>
 #include <stdint.h>
 #include <cmath>
 #include <stdio.h>
 #include <unistd.h>
 #define MAX_H 230
-void HSVtoRGB(int H, double S, double V, uint8_t output[3])
+void HSVtoRGB(uint16_t H, double S, double V, uint8_t output[3])
 {
     double C = S * V;
     double X = C * (1 - std::abs(std::fmod(H / 60.0, 2) - 1));
@@ -73,13 +71,19 @@ float average(void)
     return(loadavg);
 }
 
-
-void get_cpu_color(uint8_t output[3])
+void get_cpu_color(uint16_t &hue)
 {
-    double s = 1;
-    double v = 1;
     float cpu_usage_percent = average();
     int h = MAX_H - ( (float)MAX_H * cpu_usage_percent);
     std::cout << "h: " << (int) h << std::endl;
-    HSVtoRGB(h, s, v, output);
+    hue = h;
+}
+
+void get_cpu_color(uint8_t rgb_color[3])
+{
+    double s = 1;
+    double v = 1;
+    uint16_t h;
+    get_cpu_color(h);
+    HSVtoRGB(h, s, v, rgb_color);
 }

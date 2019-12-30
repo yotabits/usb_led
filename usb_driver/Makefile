@@ -1,5 +1,5 @@
 CXX         := -c++
-CXXFLAGS    := -Wall
+CXXFLAGS    := -Wall -std=c++11 -pthread
 INCLUDE     := -Iincludes
 LDLIBS      := -lusb-1.0
 BUILD       := ./build
