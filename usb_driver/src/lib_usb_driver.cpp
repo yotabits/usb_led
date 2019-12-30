@@ -3,6 +3,7 @@
 #include <usb.h>
 #include <cmath>
 #include <stdio.h>
+#include <thread>
 #include "cpu_color.h"
 #define VID 0x16c0
 #define PID 0x05df
@@ -66,16 +67,6 @@ void show_variation(libusb_device_handle* dev_handle,
         set_led_to_hue(dev_handle, start_hue);
     }
 }
-void show_color_range(libusb_device_handle* dev_handle)
-{
-    uint8_t to_show[3];
-    for (uint16_t color_h = 230; color_h > 0; color_h--)
-    {
-        HSVtoRGB(color_h, 1, 1, to_show);
-        set_rgb_led_to(dev_handle, to_show);
-        usleep(10000);
-    }
-}
 
 int main()
 {
@@ -98,7 +89,7 @@ int main()
 
     libusb_device_handle* dev_handle = libusb_open_device_with_vid_pid(ctx, VID, PID);
     if (!dev_handle)
-        std::cout << "failed to open device" << std::endl;
+        std::cout << "Failed to open device" << std::endl;
 
     libusb_free_device_list(devs, 1);
 
@@ -114,11 +105,17 @@ int main()
         std::cout << "Failed to claim interface with error: " << r << std::endl;
 
     set_led_to(dev_handle, 1);
-    uint8_t rgb[3] = {};
-    show_variation(dev_handle, 230, 0, 3000000);
+    uint16_t last_hue = 230;
+    show_variation(dev_handle, last_hue, 0, 1000000);
+    uint16_t target_hue;
+    std::thread led_thread;
+    get_cpu_color(target_hue);
     while (true)
     {
-        get_cpu_color(rgb);
-        set_rgb_led_to(dev_handle, rgb);
+        led_thread = std::thread(show_variation, dev_handle, last_hue, target_hue, 1000000);
+        last_hue = target_hue;
+        get_cpu_color(target_hue);
+        std::cout << target_hue << std::endl;
+        led_thread.join();
     }
 }
