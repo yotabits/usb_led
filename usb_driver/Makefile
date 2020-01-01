@@ -26,5 +26,8 @@ build:
 	@mkdir -p $(OUTPUT_DIR)
 	@mkdir -p $(OBJ_DIR)
 
+install: all
+	cp $(TARGET) /usr/bin/
+
 debug: CXXFLAGS += -DDEBUG -g
 debug: all
