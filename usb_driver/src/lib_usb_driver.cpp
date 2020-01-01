@@ -8,6 +8,10 @@
 #define VID 0x16c0
 #define PID 0x05df
 
+enum exit_codes {
+    DEVICE_DISCONNECTED,
+    DEVICE_NOT_CONNECTED,
+};
 
 void send_data(uint8_t request, unsigned char *to_send,
                libusb_device_handle* dev_handle, uint16_t data_length)
@@ -19,6 +23,8 @@ void send_data(uint8_t request, unsigned char *to_send,
     unsigned int timeout = 0;
     int sent = libusb_control_transfer(dev_handle, bmRequestType, bRequest,
                             wValue, wIndex, to_send, data_length, timeout);
+    if (sent == LIBUSB_ERROR_NO_DEVICE)
+        exit(1);
     std::cout << sent << " bytes sent" << std::endl;
 }
 
@@ -88,10 +94,12 @@ int main()
     std::cout << nb_devices << " Devices found." << std::endl; //print total number of usb devices
 
     libusb_device_handle* dev_handle = libusb_open_device_with_vid_pid(ctx, VID, PID);
-    if (!dev_handle)
-        std::cout << "Failed to open device" << std::endl;
-
     libusb_free_device_list(devs, 1);
+    if (!dev_handle)
+    {
+        std::cout << "Failed to open device" << std::endl;
+        exit(DEVICE_NOT_CONNECTED);
+    }
 
     if (libusb_kernel_driver_active(dev_handle, 0))
         libusb_detach_kernel_driver(dev_handle, 0);
