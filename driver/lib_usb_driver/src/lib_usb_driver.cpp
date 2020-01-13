@@ -17,6 +17,7 @@ void send_data(uint8_t request, unsigned char *to_send,
                libusb_device_handle* dev_handle, uint16_t data_length)
 {
     uint8_t bmRequestType = USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_OUT;
+    std::cout << (unsigned int)bmRequestType << " bRRRRnt" << std::endl;
     uint8_t bRequest = request;
     uint16_t wValue = 0xDEAD; // Arbitrary vendor requests
     uint16_t wIndex = 0xBEEF; // Arbitrary vendor requests
