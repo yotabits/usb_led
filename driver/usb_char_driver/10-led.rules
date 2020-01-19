@@ -1,0 +1,1 @@
+ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="05df", PROGRAM="/bin/sh -c 'echo -n $id:1.0 >/sys/bus/usb/drivers/usbhid/unbind; echo -n $id:1.0 > /sys/bus/usb/drivers/rgb_led/bind'"
