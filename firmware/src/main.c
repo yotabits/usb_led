@@ -9,7 +9,7 @@
 
 #define LED             PB1
 #define RGB_LED         PB2
-#define RGB_LED_NUMBER  1
+#define RGB_LED_NUMBER  12
 
 DEFINE_WS2811_FN(WS2811RGB, PORTB, RGB_LED)
 
@@ -49,12 +49,13 @@ void flip_led()
 {
     PORTB ^= (1  << LED);
 }
-
-// bRequest = 1 ---> flip led
-// bRequest = 2 ---> set led to value of lsb of received data
-//                   we expect exactly 1 byte
-// bRequest = 3 ---> TBD (probably rgb) we expect exactly 3 bytes
-
+/*
+* bRequest = 1 ---> flip led
+* bRequest = 2 ---> Do led operations
+*                   both both for on board led and rgb led
+*                   for more details on operation look at
+*                   usbFunctionWrite
+*/
 usbMsgLen_t usbFunctionSetup(uchar setupData[8])
 {
     usbRequest_t *rq = (void *)setupData;
@@ -67,16 +68,36 @@ usbMsgLen_t usbFunctionSetup(uchar setupData[8])
 
 uchar usbFunctionWrite(uchar *data, uchar len)
 {
-    //set_led_to(data[0]);
+    /*
+     * Byte 0 --> led on ( >= 1 ) or off ( = 0)
+     */
     if (len == 1)
     {
         led_status_g.led_status = data[0];
     }
-    else if (len == 3)
+    /*
+     * Byte 0 --> R value
+     * Byte 1 --> G value
+     * Byte 2 --> B value
+     */
+    else if (len == 3) // receiving rgb data for a single led
     {
         led_status_g.rgb_led[0].r = data[0];
         led_status_g.rgb_led[0].g = data[1];
         led_status_g.rgb_led[0].b = data[2];
+    }
+    /*
+     * Byte 0 --> led number
+     * Byte 1 --> R value
+     * Byte 2 --> G value
+     * Byte 3 --> B value
+     */
+    else if (len == 4)
+    {
+        uint8_t led_number = data[0];
+        led_status_g.rgb_led[led_number].r = data[1];
+        led_status_g.rgb_led[led_number].g = data[2];
+        led_status_g.rgb_led[led_number].b = data[3];
     }
     update_leds(led_status_g);
     return 1;
