@@ -12,6 +12,13 @@ static struct usb_driver rgb_led_driver;
 
 struct usb_led {
     struct usb_device *udev;
+    /*
+     * rgb is the buffer we will end up sending to deice,
+     * Byte 0 --> led number
+     * Byte 1 --> R value
+     * Byte 2 --> G value
+     * Byte 3 --> B value
+     */
     uint8_t *rgb;
 };
 
@@ -42,7 +49,7 @@ static ssize_t led_write(struct file *file, const char __user *user_buffer,
     uint8_t to_send_size;
     int bytes_sent;
 
-    to_send_size = 3 * sizeof(char);
+    to_send_size = 4 * sizeof(char);
     return_value = 0;
     data_in = kmalloc(count * sizeof(char), GFP_KERNEL);
     if (!data_in){
@@ -71,16 +78,18 @@ static ssize_t led_write(struct file *file, const char __user *user_buffer,
     dev->rgb[0] = 0xff & *user_rgb;
     dev->rgb[1] = 0xff & (*user_rgb >> 8);
     dev->rgb[2] = 0xff & (*user_rgb >> 16);
+    dev->rgb[3] = 0xff & (*user_rgb >> 24);
 
     /* to replace with dev_dbg */
-    printk(KERN_INFO "r %d \n", dev->rgb[0]);
-    printk(KERN_INFO "g %d \n", dev->rgb[1]);
-    printk(KERN_INFO "b %d \n", dev->rgb[2]);
+    printk(KERN_INFO "led_number %d \n", dev->rgb[0]);
+    printk(KERN_INFO "r %d \n", dev->rgb[1]);
+    printk(KERN_INFO "g %d \n", dev->rgb[2]);
+    printk(KERN_INFO "b %d \n", dev->rgb[3]);
 
     /* wValue & wIndex are arbitrary */
     bytes_sent = usb_control_msg(udev, usb_sndctrlpipe(udev, 0), 2,
                                  USB_TYPE_VENDOR | USB_RECIP_DEVICE, 0xDEAD,
-                                 0xBEEF, dev->rgb, 3 , 0);
+                                 0xBEEF, dev->rgb, to_send_size , 0);
 
     if (bytes_sent == to_send_size){
       return_value = count;
@@ -131,8 +140,7 @@ static int rgb_led_probe(struct usb_interface *interface,
     if (!led_dev){
         return -ENOMEM;
     }
-
-    led_dev->rgb = kmalloc(sizeof(uint8_t) * 3, GFP_KERNEL);
+    led_dev->rgb = kmalloc(sizeof(uint8_t) * 4, GFP_KERNEL);
     if (!led_dev->rgb){
         return -ENOMEM;
     }
