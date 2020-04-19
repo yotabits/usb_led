@@ -120,7 +120,7 @@ static struct file_operations led_fops = {
 };
 
 static struct usb_class_driver led_class = {
-	.name       = "rgb_led%d",
+	.name       = "rgb_led",
 	.fops       = &led_fops,      /* Connect with /dev/rgb_led%d */
 	.minor_base = LED_MINOR_BASE, /* Minor number start */
 };
