@@ -17,7 +17,7 @@ DEFINE_WS2811_FN(WS2811RGB, PORTB, RGB_LED)
   #error "Wrong F_CPU"
 #endif
 
-PROGMEM const char usbHidReportDescriptor[22] = {   /* USB report descriptor */
+/*PROGMEM const char usbHidReportDescriptor[22] = {   *//* USB report descriptor *//*
   0x06, 0x00, 0xff,              // USAGE_PAGE (Generic Desktop)
   0x09, 0x01,                    // USAGE (Vendor Usage 1)
   0xa1, 0x01,                    // COLLECTION (Application)
@@ -28,7 +28,7 @@ PROGMEM const char usbHidReportDescriptor[22] = {   /* USB report descriptor */
   0x09, 0x00,                    //   USAGE (Undefined)
   0xb2, 0x02, 0x01,              //   FEATURE (Data,Var,Abs,Buf)
   0xc0                           // END_COLLECTION
-};
+};*/
 
 typedef struct leds_status
 {
@@ -64,6 +64,12 @@ usbMsgLen_t usbFunctionSetup(uchar setupData[8])
     else if (rq->bRequest == 2)
         return USB_NO_MSG;
     return 0;
+}
+
+void update_leds(leds_status_t status)
+{
+    WS2811RGB(status.rgb_led, ARRAYLEN(status.rgb_led));
+    set_led_to(status.led_status);
 }
 
 uchar usbFunctionWrite(uchar *data, uchar len)
@@ -111,7 +117,6 @@ void setup_led_as_output()
     DDRB |= (1 << RGB_LED); // set rgb led pin as output
 }
 
-
 void begin()
 {
   cli();
@@ -127,11 +132,7 @@ void begin()
   usbDeviceConnect();
   sei();
 }
-void update_leds(leds_status_t status)
-{
-    WS2811RGB(status.rgb_led, ARRAYLEN(status.rgb_led));
-    set_led_to(status.led_status);
-}
+
 int main()
 {
     //RGB_t rgb[1];
