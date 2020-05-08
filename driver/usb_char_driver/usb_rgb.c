@@ -5,7 +5,7 @@
 #include <linux/usb.h>
 
 #define VENDOR_ID 0x16c0
-#define PRODUCT_ID 0x05df
+#define PRODUCT_ID 0x05dc
 #define LED_MINOR_BASE 0
 
 static struct usb_driver rgb_led_driver;
