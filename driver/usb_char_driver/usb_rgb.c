@@ -82,10 +82,10 @@ static ssize_t led_write(struct file *file, const char __user *user_buffer,
 	device_data->rgb[3] = 0xff & (*user_rgb >> 24);
 
 	/* to replace with dev_dbg */
-	printk(KERN_INFO "led_number %d\n", device_data->rgb[0]);
-	printk(KERN_INFO "r %d\n", device_data->rgb[1]);
-	printk(KERN_INFO "g %d\n", device_data->rgb[2]);
-	printk(KERN_INFO "b %d\n", device_data->rgb[3]);
+	dev_dbg(&(udev->dev), "led_number %d\n", device_data->rgb[0]);
+	dev_dbg(&(udev->dev), "r %d\n", device_data->rgb[1]);
+	dev_dbg(&(udev->dev), "g %d\n", device_data->rgb[2]);
+	dev_dbg(&(udev->dev), "b %d\n", device_data->rgb[3]);
 
 	/* wValue & wIndex are arbitrary */
 	bytes_sent = usb_control_msg(udev, usb_sndctrlpipe(udev, 0), 2,
@@ -97,12 +97,12 @@ static ssize_t led_write(struct file *file, const char __user *user_buffer,
 	else
 		return_value = -EINVAL; /* is that correct ? */
 
-	printk(KERN_INFO "Control message return %d\n", bytes_sent);
+	dev_dbg(&(udev->dev), "Control message return %d\n", bytes_sent);
 
 	/* to replace with dev_dbg */
-	printk(KERN_INFO "int value %ld\n", *user_rgb);
-	printk(KERN_INFO "data in %s\n", data_in);
-	printk(KERN_INFO "Count %ld\n", count);
+	dev_dbg(&(udev->dev),"int value %ld\n", *user_rgb);
+	dev_dbg(&(udev->dev), "str data in %s\n", data_in);
+	dev_dbg(&(udev->dev), "Count %ld\n", count);
 
 	return_value = count;
 	goto exit;
