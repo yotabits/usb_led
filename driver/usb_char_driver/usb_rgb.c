@@ -30,12 +30,12 @@ const static struct usb_device_id device_table[] = {
 
 static int led_open(struct inode *inode, struct file *file)
 {
-	struct usb_led *dev;
+	struct usb_led *device_data;
 	struct usb_interface *interface;
 
 	interface = usb_find_interface(&rgb_led_driver, iminor(inode));
-	dev = usb_get_intfdata(interface);
-	file->private_data = dev;
+	device_data = usb_get_intfdata(interface);
+	file->private_data = device_data;
 	return 0;
 }
 
@@ -45,7 +45,7 @@ static ssize_t led_write(struct file *file, const char __user *user_buffer,
 	char *data_in;
 	long *user_rgb;
 	int return_value;
-	struct usb_led *dev;
+	struct usb_led *device_data;
 	struct usb_device *udev;
 	uint8_t to_send_size;
 	int bytes_sent;
@@ -61,8 +61,8 @@ static ssize_t led_write(struct file *file, const char __user *user_buffer,
 		kfree(data_in);
 		return -ENOMEM;
 	}
-	dev = file->private_data;
-	udev = dev->udev;
+	device_data = file->private_data;
+	udev = device_data->udev;
 
 	if (!udev) {
 		return_value = -ENODEV;
@@ -76,21 +76,21 @@ static ssize_t led_write(struct file *file, const char __user *user_buffer,
 	data_in[count - 1] = '\0';
 
 	kstrtol(data_in, 16, user_rgb);
-	dev->rgb[0] = 0xff & *user_rgb;
-	dev->rgb[1] = 0xff & (*user_rgb >> 8);
-	dev->rgb[2] = 0xff & (*user_rgb >> 16);
-	dev->rgb[3] = 0xff & (*user_rgb >> 24);
+	device_data->rgb[0] = 0xff & *user_rgb;
+	device_data->rgb[1] = 0xff & (*user_rgb >> 8);
+	device_data->rgb[2] = 0xff & (*user_rgb >> 16);
+	device_data->rgb[3] = 0xff & (*user_rgb >> 24);
 
 	/* to replace with dev_dbg */
-	printk(KERN_INFO "led_number %d\n", dev->rgb[0]);
-	printk(KERN_INFO "r %d\n", dev->rgb[1]);
-	printk(KERN_INFO "g %d\n", dev->rgb[2]);
-	printk(KERN_INFO "b %d\n", dev->rgb[3]);
+	printk(KERN_INFO "led_number %d\n", device_data->rgb[0]);
+	printk(KERN_INFO "r %d\n", device_data->rgb[1]);
+	printk(KERN_INFO "g %d\n", device_data->rgb[2]);
+	printk(KERN_INFO "b %d\n", device_data->rgb[3]);
 
 	/* wValue & wIndex are arbitrary */
 	bytes_sent = usb_control_msg(udev, usb_sndctrlpipe(udev, 0), 2,
 			USB_TYPE_VENDOR | USB_RECIP_DEVICE, 0xDEAD,
-			0xBEEF, dev->rgb, to_send_size, 0);
+			0xBEEF, device_data->rgb, to_send_size, 0);
 
 	if (bytes_sent == to_send_size)
 		return_value = count;
