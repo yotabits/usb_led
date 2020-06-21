@@ -6,7 +6,7 @@
 #include <thread>
 #include "cpu_color.h"
 #define VID 0x16c0
-#define PID 0x05df
+#define PID 0x05dc
 
 enum exit_codes {
     DEVICE_DISCONNECTED,
