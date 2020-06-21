@@ -29,5 +29,9 @@ build:
 install: all
 	cp $(TARGET) /usr/bin/
 
+clean:
+	rm -rf $(BUILD)
+	rm -rf $(OUTPUT_DIR)$(TARGET)
+
 debug: CXXFLAGS += -DDEBUG -g
 debug: all
