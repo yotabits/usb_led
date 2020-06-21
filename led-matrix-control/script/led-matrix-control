@@ -1,0 +1,50 @@
+#!/usr/bin/python3
+import psutil
+import os
+import time
+import colorsys
+import stat
+
+def check_char_special(fpath):
+    if os.path.exists(fpath):
+        mode = os.stat(fpath).st_mode
+        return stat.S_ISCHR(mode)
+
+
+def write_to_driver(r, g, b, led_number, fp):
+    to_write = ""
+    to_write += hex(int(b * 255.0)).replace('x', '')
+    to_write += hex(int(g * 255.0)).replace('x', '')
+    to_write += hex(int(r * 255.0)).replace('x', '')
+    to_write += hex(led_number).replace('x', '')
+    to_write += '\n'
+    os.write(fp, to_write.encode(encoding='utf-8', errors='strict'))
+
+
+def get_cpu():
+    return psutil.cpu_percent(percpu=True)
+
+
+# 240 is red
+def get_rgb_from_percent(cpu_percent, max_hue=240):
+    h = ((100 - cpu_percent) / 100) * (float(max_hue) / 360.0)
+    s = 1
+    l = 0.5
+    return colorsys.hls_to_rgb(h, l, s)
+
+
+def main():
+    char_path = '/dev/rgb_led'
+    while True:
+        if check_char_special(char_path):
+            data = get_cpu()
+            led_number = 0
+            for percent in data:
+                fp = os.open(char_path, os.O_WRONLY)
+                rgb = get_rgb_from_percent(percent)
+                write_to_driver(rgb[0], rgb[1], rgb[2], led_number, fp)
+                led_number += 1
+                os.close(fp)
+        time.sleep(1)
+
+main()
