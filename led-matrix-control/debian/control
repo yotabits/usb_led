@@ -1,0 +1,14 @@
+Source: led-matrix-control
+Section: misc
+Priority: optional
+Maintainer: Thomas Kostas <tkostas75@gmail.com>
+Build-Depends: debhelper (>=9)
+Depends: python3, python3-psutil
+Standards-Version: 3.9.6
+Homepage: https://github.com/yotabits/usb_led
+
+Package: led-matrix-control
+Architecture: any
+Multi-Arch: foreign
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: Simple python service writing cpu usage to /dev/rgb_led char device file.
