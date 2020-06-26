@@ -1,0 +1,10 @@
+[Unit]
+Description=launch led-matrix-control binary to display rgb colors \
+according to CPU cores usage
+
+[Service]
+ExecStart=/usr/bin/led-matrix-control
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
