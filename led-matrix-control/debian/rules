@@ -8,5 +8,5 @@
 DESTDIR=debian/led-matrix-control
 
 %:
-	dh $@
+	dh $@ --with systemd
 
