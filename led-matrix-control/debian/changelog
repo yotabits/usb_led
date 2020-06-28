@@ -1,6 +1,5 @@
 led-matrix-control (1.0-1) UNRELEASED; urgency=low
 
-  * Initial release. Closes: #nnnn
-    <nnnn is the bug number of your ITP>
+  * Initial release.
 
  -- tkostas <tkostas@gmail.com>  Sun, 21 Jun 2020 23:44:16 +0900
