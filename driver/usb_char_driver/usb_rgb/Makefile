@@ -3,7 +3,7 @@ MOD_NAME=usb_rgb
 obj-m := $(MOD_NAME).o
 
 all:
-	make -C $(KDIR) SUBDIRS=$(PWD) modules
+	make -C $(KDIR) M=$(PWD) modules
 
 clean:
 	rm -f $(obj-m)
